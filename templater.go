@@ -46,12 +46,12 @@ func NewTemplater(engine *gin.Engine, conf *Config) *Templater {
 	instance.hotReload = conf.AutoReload
 	instance.logger = log.New(os.Stdout, "[GIN-TEMPLATER] ", log.Ltime)
 	instance.builder = newTemplaterBuilder(conf.InputDir, conf.OutputDir, instance.logger)
-	instance.watcher = newTemplaterWatcher(conf.OutputDir, instance.logger)
-	instance.watcher.addListener(instance.builder.generate)
+	instance.watcher = newTemplaterWatcher(conf.InputDir, instance.logger)
 	if conf.AutoReload {
 		rebuildEv := func(data string) {
 			instance.reload()
 		}
+		instance.watcher.addListener(instance.builder.generate)
 		instance.watcher.addListener(rebuildEv)
 	}
 	return instance

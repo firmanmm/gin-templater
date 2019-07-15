@@ -23,12 +23,12 @@ func (b *templaterBuilder) initBuild() {
 		stack = stack[:len(stack)-1]
 		file, err := os.Open(current)
 		if err != nil {
-			log.Fatalln(err)
+			b.logger.Fatalln(err)
 		}
 		defer file.Close()
 		fileInfos, err := file.Readdir(0)
 		if err != nil {
-			log.Fatalln(err)
+			b.logger.Fatalln(err)
 		}
 		for _, fileInfo := range fileInfos {
 			currentPath := fmt.Sprintf("%s/%s", current, fileInfo.Name())
@@ -51,7 +51,6 @@ func (b *templaterBuilder) generate(path string) {
 	buildPath := path[len(b.inputDir)+1:]
 	buildName := strings.ReplaceAll(buildPath, "/", ".")
 	linkName := fmt.Sprintf("%s/%s", b.outputDir, buildName)
-	log.Println(path, linkName)
 	os.Link(path, linkName)
 }
 

@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 	"runtime"
+	"strings"
 	"time"
 
 	"github.com/fsnotify/fsnotify"
@@ -39,12 +40,14 @@ func (t *templaterWatcher) work() {
 			close(t.signalChan)
 			runtime.Goexit()
 		case ev := <-t.watcher.Events:
-			if ev.Op&fsnotify.Write == fsnotify.Write {
-				if time.Now().Before(timeThreshold) {
-					timeThreshold = time.Now()
+			if ev.Op == fsnotify.Write {
+				if time.Now().After(timeThreshold) {
+					timeThreshold = time.Now().Add(time.Second)
+					ev.Name = strings.ReplaceAll(ev.Name, "\\", "/")
 					t.broadcastEvent(ev.Name)
-					t.watcher.Add(ev.Name)
 				}
+			} else if ev.Op == fsnotify.Create {
+				t.watcher.Add(ev.Name)
 			}
 		}
 	}
