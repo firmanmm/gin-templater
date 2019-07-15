@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+//Templater instance to perform hot reload on Gin Web Framework
 type Templater struct {
 	logger    *log.Logger
 	engine    *gin.Engine
@@ -18,6 +19,7 @@ type Templater struct {
 
 func (t *Templater) Run() {
 	t.builder.initBuild()
+	t.reload()
 	if t.hotReload {
 		t.watcher.Run()
 		t.logger.Println("Templater started")
@@ -36,6 +38,7 @@ func (t *Templater) reload() {
 	t.logger.Println("Templater reloaded")
 }
 
+//NewTemplater will return a new and ready to use Templater instance
 func NewTemplater(engine *gin.Engine, conf *Config) *Templater {
 	instance := new(Templater)
 	instance.engine = engine
@@ -45,5 +48,11 @@ func NewTemplater(engine *gin.Engine, conf *Config) *Templater {
 	instance.builder = newTemplaterBuilder(conf.InputDir, conf.OutputDir, instance.logger)
 	instance.watcher = newTemplaterWatcher(conf.OutputDir, instance.logger)
 	instance.watcher.addListener(instance.builder.generate)
+	if conf.AutoReload {
+		rebuildEv := func(data string) {
+			instance.reload()
+		}
+		instance.watcher.addListener(rebuildEv)
+	}
 	return instance
 }

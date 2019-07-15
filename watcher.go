@@ -83,8 +83,8 @@ func (t *templaterWatcher) Run() {
 	if err != nil {
 		t.logger.Fatalln(err)
 	}
-	t.initDirectoryWatcher(t.watchDir)
 	t.watcher = watcher
+	t.initDirectoryWatcher(t.watchDir)
 	go t.work()
 }
 

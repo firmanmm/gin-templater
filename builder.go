@@ -48,10 +48,11 @@ func (b *templaterBuilder) prepareOutputDir() {
 }
 
 func (b *templaterBuilder) generate(path string) {
-	buildPath := path[len(b.inputDir):]
+	buildPath := path[len(b.inputDir)+1:]
 	buildName := strings.ReplaceAll(buildPath, "/", ".")
 	linkName := fmt.Sprintf("%s/%s", b.outputDir, buildName)
-	os.Symlink(path, linkName)
+	log.Println(path, linkName)
+	os.Link(path, linkName)
 }
 
 func newTemplaterBuilder(inputDir, outputDir string, logger *log.Logger) *templaterBuilder {
